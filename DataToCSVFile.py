@@ -36,7 +36,7 @@ try:
             if value.isdigit():
                 Amount = int(value)
             else:
-                print("Parameter 'amount:' having wrong value. Using default value (dolboyob ne znaet chto takoe chisla lol, idi nahuj teper')")
+                print("Parameter 'amount:' having wrong value. Using default value...")
                 Amount = DefaultAmount
             
 
