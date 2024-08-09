@@ -46,6 +46,20 @@ for _ in range(Amount):
     _user.PhoneNumber = "+" + str(PhoneNumber)
 
     Users.append(_user)
+
+StartIndex = 0
+ExecutionPath = PathToCurrentFile()
+FileDirectory = ExecutionPath[StartIndex:ExecutionPath.rfind("\\") + 1]
+PathTofile = FileDirectory + "TestData.csv"
+
+File = open(PathTofile, "a+")
+for _user in Users:
+    File.write(_user.FirstName + ";" + _user.LastName + ";'" + _user.PhoneNumber + ";" + _user.Email + ";" + "\n");
+
+print("File with test data been written and located in " + PathTofile)
+File.close()
+
+
     
 '''
 for _user in Users:
@@ -58,15 +72,3 @@ for _user in Users:
 
     print(_user.FirstName + " " + _user.LastName + Divisor + _user.PhoneNumber + "  " + _user.Email)
 '''
-
-StartIndex = 0
-ExecutionPath = PathToCurrentFile()
-FileDirectory = ExecutionPath[StartIndex:ExecutionPath.rfind("\\") + 1]
-PathTofile = FileDirectory + "TestData.csv"
-
-File = open(PathTofile, "a+")
-for _user in Users:
-    File.write(_user.FirstName + ";" + _user.LastName + ";" + _user.PhoneNumber + ";" + _user.Email + ";" + "\n");
-
-print("File with test data been written and located in " + PathTofile)
-File.close()
