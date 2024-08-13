@@ -14,10 +14,10 @@ def GetCurrentDateTime_FormattedString():
 def CalculateExecutionTime(StartTime):
     EndTime = datetime.now()
     ExecutionTime = EndTime - StartTime
-    ElapsedMilliseconds = int(ExecutionTime.microseconds / 1000)
-    ElapsedSeconds = str(ExecutionTime.seconds % 60) if ExecutionTime.seconds > 10 else "0" + str(ExecutionTime.seconds)
-    ElapsedMinutes = int(ExecutionTime.seconds / 60) if (ExecutionTime.seconds / 60) > 10 else "0" + str(int(ExecutionTime.seconds / 60))
-    ElapsedHours = int((ExecutionTime.seconds / 60) / 60) if int((ExecutionTime.seconds / 60) / 60) > 10 else "0" + str(int(((ExecutionTime.seconds / 60) / 60)))    
+    ElapsedMilliseconds = int(ExecutionTime.microseconds / 1000) if (ExecutionTime.microseconds / 1000) > 99 else "0" + str(int(ExecutionTime.microseconds / 1000))
+    ElapsedSeconds = str(ExecutionTime.seconds % 60) if ExecutionTime.seconds > 9 else "0" + str(ExecutionTime.seconds)
+    ElapsedMinutes = int(ExecutionTime.seconds / 60) if (ExecutionTime.seconds / 60) > 9 else "0" + str(int(ExecutionTime.seconds / 60))
+    ElapsedHours = int((ExecutionTime.seconds / 60) / 60) if int((ExecutionTime.seconds / 60) / 60) > 9 else "0" + str(int(((ExecutionTime.seconds / 60) / 60)))    
     return f"{ElapsedHours}:{ElapsedMinutes}:{ElapsedSeconds}.{ElapsedMilliseconds}"
 
 class User:
