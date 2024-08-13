@@ -91,7 +91,11 @@ except Exception as ex:
 finally:
     EndTime = datetime.now()
     ExecutionTime = EndTime - StartTime
-    formatted_time = f'{ExecutionTime.seconds / 60} minutes'
+    ExecutionSeconds = str(ExecutionTime.seconds) if ExecutionTime.seconds > 10 else "0" + str(ExecutionTime.seconds)
+    ExecutionMinutes = int(ExecutionTime.seconds / 60)
+    ExecutionMilliseconds = int(ExecutionTime.microseconds / 1000)
+    
+    formatted_time = f"{ExecutionMinutes}:{ExecutionSeconds}.{ExecutionMilliseconds}"
     print("Process finished at " + GetCurrentDateTime_FormattedString())
     print("Execution time: " + formatted_time)
 
