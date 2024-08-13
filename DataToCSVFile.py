@@ -9,7 +9,16 @@ def PathToCurrentFile():
     return os.path.abspath(__file__)
 
 def GetCurrentDateTime_FormattedString():
-    return str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))    
+    return str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))   
+
+def CalculateExecutionTime(StartTime):
+    EndTime = datetime.now()
+    ExecutionTime = EndTime - StartTime
+    ElapsedMilliseconds = int(ExecutionTime.microseconds / 1000)
+    ElapsedSeconds = str(ExecutionTime.seconds % 60) if ExecutionTime.seconds > 10 else "0" + str(ExecutionTime.seconds)
+    ElapsedMinutes = int(ExecutionTime.seconds / 60) if (ExecutionTime.seconds / 60) > 10 else "0" + str(int(ExecutionTime.seconds / 60))
+    ElapsedHours = int((ExecutionTime.seconds / 60) / 60) if int((ExecutionTime.seconds / 60) / 60) > 10 else "0" + str(int(((ExecutionTime.seconds / 60) / 60)))    
+    return f"{ElapsedHours}:{ElapsedMinutes}:{ElapsedSeconds}.{ElapsedMilliseconds}"
 
 class User:
     def __init__(self, firstName, lastName):
@@ -89,15 +98,10 @@ except Exception as ex:
         ErrorLog.write(str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + "\t" + str(ex))
         ErrorLog.write("\n")
 finally:
-    EndTime = datetime.now()
-    ExecutionTime = EndTime - StartTime
-    ExecutionSeconds = str(ExecutionTime.seconds) if ExecutionTime.seconds > 10 else "0" + str(ExecutionTime.seconds)
-    ExecutionMinutes = int(ExecutionTime.seconds / 60)
-    ExecutionMilliseconds = int(ExecutionTime.microseconds / 1000)
+    TotalExecutionTime = CalculateExecutionTime(StartTime)
     
-    formatted_time = f"{ExecutionMinutes}:{ExecutionSeconds}.{ExecutionMilliseconds}"
     print("Process finished at " + GetCurrentDateTime_FormattedString())
-    print("Execution time: " + formatted_time)
+    print("Execution time: " + TotalExecutionTime + "\n")
 
 
 

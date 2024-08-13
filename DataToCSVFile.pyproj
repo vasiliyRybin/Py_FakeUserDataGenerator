@@ -12,7 +12,7 @@
     <Name>DataToCSVFile</Name>
     <RootNamespace>DataToCSVFile</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>amount:100 Ololoo Test</CommandLineArguments>
+    <CommandLineArguments>amount:10000 Ololoo Test</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
