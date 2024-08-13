@@ -41,7 +41,7 @@ try:
     DefaultAmount = 50
     StartTime = datetime.now()
     EndTime = datetime.now()
-    print("Process started at " + GetCurrentDateTime_FormattedString() + "\n")
+    print("Process started at " + GetCurrentDateTime_FormattedString())
     
     #test = 0 / 0
 
@@ -51,13 +51,15 @@ try:
             if value.isdigit():
                 Amount = int(value)
             else:
-                print("Parameter 'amount:' having wrong value. Using default value...")
+                print("Parameter 'amount:' having wrong value. Using default value... \n")
                 Amount = DefaultAmount
             
 
     if Amount == None:
-        print("Parameter 'amount:' was not found. Using default value")
+        print("Parameter 'amount:' was not found. Using default value \n")
         Amount = DefaultAmount
+            
+    print("Amount of data to be generated: " + str(Amount) + "\n")
 
     Users = []
 
@@ -94,6 +96,7 @@ try:
     print("File with test data was successfully created and can be found in " + PathTofile + "\n")
 
 except Exception as ex:
+    print(str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + "\t" + str(ex))
     with open(PathToLog, mode="a+", encoding="utf-8") as ErrorLog:
         ErrorLog.write(str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + "\t" + str(ex))
         ErrorLog.write("\n")
