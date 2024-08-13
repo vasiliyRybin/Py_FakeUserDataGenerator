@@ -8,6 +8,9 @@ import csv
 def PathToCurrentFile():
     return os.path.abspath(__file__)
 
+def GetCurrentDateTime_FormattedString():
+    return str(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))    
+
 class User:
     def __init__(self, firstName, lastName):
         self.FirstName = firstName
@@ -27,6 +30,9 @@ try:
     Arguments = sys.argv[1:]
     Amount = None
     DefaultAmount = 50
+    StartTime = datetime.now()
+    EndTime = datetime.now()
+    print("Process started at " + GetCurrentDateTime_FormattedString() + "\n")
     
     #test = 0 / 0
 
@@ -54,7 +60,7 @@ try:
         Email = FirstName.lower() + "." + LastName.lower() + "@test.com"
         _user.Email = Email
     
-        PhoneNumber = random.randrange(123456789, 999999999)
+        PhoneNumber = random.randrange(111111119, 999999999)
         _user.PhoneNumber = "'+" + str(PhoneNumber)
 
         Users.append(_user)
@@ -76,12 +82,18 @@ try:
                            )
     
 
-    print("File with test data was successfully created and can be found in " + PathTofile)
+    print("File with test data was successfully created and can be found in " + PathTofile + "\n")
 
 except Exception as ex:
     with open(PathToLog, mode="a+", encoding="utf-8") as ErrorLog:
         ErrorLog.write(str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + "\t" + str(ex))
         ErrorLog.write("\n")
+finally:
+    EndTime = datetime.now()
+    ExecutionTime = EndTime - StartTime
+    formatted_time = f'{ExecutionTime.seconds / 60} minutes'
+    print("Process finished at " + GetCurrentDateTime_FormattedString())
+    print("Execution time: " + formatted_time)
 
 
 
