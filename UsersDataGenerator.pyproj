@@ -5,7 +5,7 @@
     <ProjectGuid>ea2e9354-798e-49f1-b886-7b0d815ef870</ProjectGuid>
     <ProjectHome>
     </ProjectHome>
-    <StartupFile>DataToCSVFile.py</StartupFile>
+    <StartupFile>Main_DataGenerator.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -28,7 +28,7 @@
     <Compile Include="DataGenerators.py" />
     <Compile Include="UserClass.py" />
     <Compile Include="Queries.py" />
-    <Compile Include="DataToCSVFile.py" />
+    <Compile Include="Main_DataGenerator.py" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
