@@ -41,6 +41,7 @@ def CalculateExecutionTime(StartTime):
     ElapsedHours = int((ExecutionTime.seconds / 60) / 60) if int((ExecutionTime.seconds / 60) / 60) > 9 else "0" + str(int(((ExecutionTime.seconds / 60) / 60)))    
     return f"{ElapsedHours}:{ElapsedMinutes}:{ElapsedSeconds}.{ElapsedMilliseconds}"
 
+
 class User:
     def __init__(self, firstName, lastName, taxesPayerNumber, passNumber):
         self.FirstName = firstName
@@ -103,7 +104,7 @@ try:
 
     Users = []
 
-    for _ in range(Amount):
+    for i in range(Amount):
         FirstName = names.get_first_name()
         LastName = names.get_last_name()
         TaxesPayerNumber = TaxesPayerNumberGenerator(InvalidTaxPayerRatio)
@@ -113,10 +114,16 @@ try:
         Email = FirstName.lower() + "." + LastName.lower() + "@test.com"
         _user.Email = Email
     
-        PhoneNumber = random.randrange(111111119, 999999999)
+        PhoneNumber = random.randrange(111111111, 999999999)
         _user.PhoneNumber = "'+" + str(PhoneNumber)
 
         Users.append(_user)
+
+        #Here we calculating the completion of task in percents
+        #We'll display each 10 percents completion of task (if you would like to change it, you need to change the 10 in (Amount // 10) part (Higher value - more often you see percentage))
+        if (i + 1) % (Amount // 10) == 0:
+            PercentComplete = (i + 1) * 100 // Amount
+            print( GetCurrentDateTime_FormattedString() + "     " + f"{PercentComplete}% Completed")
 
 
     with open(PathTofile, mode="a+", encoding="utf-8-sig", newline='') as CsvFile:
