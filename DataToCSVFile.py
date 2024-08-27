@@ -9,9 +9,10 @@ def TaxesPayerNumberGenerator(InvalidTaxPayerRatio):
     while True:
         TaxPayerNumber = 0
         if random.randrange(0, 100) > InvalidTaxPayerRatio:
-            TaxPayerNumber = random.randrange(1111111111, 9999999999)
+            TaxPayerNumber = random.randrange(ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
         else:
-            TaxPayerNumber = random.randrange(0, 999999999)            
+            #Here's would be generated invalid TaxPayerNumber
+            TaxPayerNumber = random.randrange(0, ValidTaxesPayerNumber_LowerValue - 1)            
         
         if not any(user.TaxesPayerNumber == TaxPayerNumber for user in Users) :
             return TaxPayerNumber
@@ -20,7 +21,7 @@ def KurwaPassNumberGenerator():
     while True:
         Letters = "AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUWYZŹŻ"
         Letter = Letters[random.randrange(0, len(Letters) - 1)]
-        PassNumber = "ZZ" + Letter + str(random.randrange(111111, 999999))   
+        PassNumber = "ZZ" + Letter + str(random.randrange(100000, 999999))   
 
         if not any(user.PassNumber == PassNumber for user in Users) :
             return PassNumber
@@ -35,7 +36,7 @@ def CalculateExecutionTime(StartTime):
     EndTime = datetime.now()
     ExecutionTime = EndTime - StartTime
     ElapsedMilliseconds = int(ExecutionTime.microseconds / 1000) if (ExecutionTime.microseconds / 1000) > 99 else "0" + str(int(ExecutionTime.microseconds / 1000))
-    ElapsedSeconds = str(ExecutionTime.seconds % 60) if ExecutionTime.seconds > 9 else "0" + str(ExecutionTime.seconds)
+    ElapsedSeconds = str(ExecutionTime.seconds % 60) if ExecutionTime.seconds > 9 else str("0") + str(ExecutionTime.seconds)
     ElapsedMinutes = int(ExecutionTime.seconds / 60) if (ExecutionTime.seconds / 60) > 9 else "0" + str(int(ExecutionTime.seconds / 60))
     ElapsedHours = int((ExecutionTime.seconds / 60) / 60) if int((ExecutionTime.seconds / 60) / 60) > 9 else "0" + str(int(((ExecutionTime.seconds / 60) / 60)))    
     return f"{ElapsedHours}:{ElapsedMinutes}:{ElapsedSeconds}.{ElapsedMilliseconds}"
@@ -55,6 +56,8 @@ ExecutionPath = PathToCurrentFile()
 FileDirectory = ExecutionPath[StartIndex:ExecutionPath.rfind("\\") + 1]
 PathTofile = FileDirectory + "TestData.csv"
 PathToLog = FileDirectory + "Log.txt"
+ValidTaxesPayerNumber_LowerValue = 1000000000
+ValidTaxesPayerNumber_MaxValue = 9999999999
 
 try:
     AppName = sys.argv[0]
@@ -120,7 +123,7 @@ try:
         FieldNames = ["First name", "Last name", "Phone number", "Email", "Tax payer number", "Pass number", "Comment"]
         writer = csv.DictWriter(CsvFile, fieldnames=FieldNames, extrasaction="ignore", delimiter=";")
         writer.writeheader()
-    
+
         for user in Users:
             writer.writerow(
                              {
@@ -130,7 +133,7 @@ try:
                                  "Email" : user.Email,
                                  "Tax payer number" : user.TaxesPayerNumber,
                                  "Pass number" : user.PassNumber,
-                                 "Comment" : "O kurwa! Popierdolony numer podatnika" if len(str(user.TaxesPayerNumber)) < 10 else "" 
+                                 "Comment" : "O kurwa! Popierdolony numer podatnika" if user.TaxesPayerNumber < ValidTaxesPayerNumber_LowerValue else "" 
                              }
                            )
     
