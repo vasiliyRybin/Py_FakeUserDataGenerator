@@ -56,7 +56,7 @@ def WriteInfoToDB():
                     {
                         'FirstName': user.FirstName,
                         'LastName': user.LastName,
-                        'PhoneNumber': user.PhoneNumber,
+                        'PhoneNumber': user.PhoneNumber.replace('\'', ''),
                         'Email': user.Email,
                         'TaxID': user.TaxesPayerNumber,
                         'PassNumber': user.PassNumber,
@@ -143,8 +143,8 @@ try:
     while i < Amount:
         FirstName = names.get_first_name()
         LastName = names.get_last_name()
-        TaxesPayerNumber = TaxesPayerNumberGenerator(InvalidTaxPayerRatio, ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
-        PassNumber = KurwaPassNumberGenerator()
+        TaxesPayerNumber = TaxesPayerNumberGenerator(Users, InvalidTaxPayerRatio, ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
+        PassNumber = KurwaPassNumberGenerator(Users)
         _user = User(FirstName, LastName, TaxesPayerNumber, PassNumber)
     
         Email = FirstName.lower() + "." + LastName.lower() + "@test.com"
@@ -161,7 +161,7 @@ try:
         # Here we calculating the completion of task in percents
         # It'll display each 5 percents completion of task 
         # if you would like to change it, you need to change the 20 in (Amount // 20) part (Higher value - more often you see percentage. Max value - 100)
-        if (i) % (Amount // 20) == 0:
+        if (i) % (Amount // 100) == 0:
             PercentComplete = (i) * 100 // Amount
             print( GetCurrentDateTime_FormattedString() + "     " + f"{PercentComplete}% Completed")
 

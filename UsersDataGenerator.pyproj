@@ -13,7 +13,7 @@
     <Name>UsersDataGenerator</Name>
     <RootNamespace>DataToCSVFile</RootNamespace>
     <LaunchProvider>Standard Python launcher</LaunchProvider>
-    <CommandLineArguments>amount:1000 invalid_tax_id_ratio:5 output_to:2</CommandLineArguments>
+    <CommandLineArguments>amount:1000 invalid_tax_id_ratio:10 output_to:1</CommandLineArguments>
     <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
