@@ -6,25 +6,18 @@ import names
 import csv
 
 def TaxesPayerNumberGenerator(InvalidTaxPayerRatio):
-    while True:
-        TaxPayerNumber = 0
-        if random.randrange(0, 100) > InvalidTaxPayerRatio:
-            TaxPayerNumber = random.randrange(ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
-        else:
-            #Here's would be generated invalid TaxPayerNumber
-            TaxPayerNumber = random.randrange(0, ValidTaxesPayerNumber_LowerValue - 1)            
-        
-        if not any(user.TaxesPayerNumber == TaxPayerNumber for user in Users) :
-            return TaxPayerNumber
+    if random.randrange(0, 100) > InvalidTaxPayerRatio:
+        return random.randrange(ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
+    else:
+        #Here's would be generated invalid TaxPayerNumber
+        return random.randrange(0, ValidTaxesPayerNumber_LowerValue - 1) 
     
-def KurwaPassNumberGenerator():
-    while True:
-        Letters = "AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUWYZŹŻ"
-        Letter = Letters[random.randrange(0, len(Letters) - 1)]
-        PassNumber = "ZZ" + Letter + str(random.randrange(100000, 999999))   
+def KurwaPassNumberGenerator():    
+    Letters = "AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUWYZŹŻ"
+    Letter = Letters[random.randrange(0, len(Letters) - 1)]
+    PassNumber = "ZZ" + Letter + str(random.randrange(100000, 999999))   
 
-        if not any(user.PassNumber == PassNumber for user in Users) :
-            return PassNumber
+    return PassNumber
 
 def PathToCurrentFile():
     return os.path.abspath(__file__)
@@ -50,6 +43,15 @@ class User:
         self.PhoneNumber = "+111111111"
         self.TaxesPayerNumber = taxesPayerNumber
         self.PassNumber = passNumber
+
+    def __eq__(self, other):
+        if isinstance(other, User):
+            return (self.TaxesPayerNumber == other.TaxesPayerNumber and
+                    self.PassNumber == other.PassNumber)
+        return False
+
+    def __hash__(self):
+        return hash((self.TaxesPayerNumber, self.PassNumber))
   
 
 StartIndex = 0
@@ -72,6 +74,7 @@ try:
     print("Process started at " + GetCurrentDateTime_FormattedString())
     
     for item in Arguments:
+        
         if item.startswith("amount:"):
             value = item.split(":")[1]
             if value.isdigit():
@@ -79,6 +82,7 @@ try:
             else:
                 print("Parameter 'amount:' having wrong value. Using default value... \n")
                 Amount = DefaultAmount
+        
         elif item.startswith("invalid_tax_id_ratio"):
             value = item.split(":")[1]
             if value.isdigit():
@@ -102,9 +106,10 @@ try:
             
     print("Amount of data to be generated: " + str(Amount) + "\n")
 
-    Users = []
+    Users = set([])
+    i = 0
 
-    for i in range(Amount):
+    while i < Amount:
         FirstName = names.get_first_name()
         LastName = names.get_last_name()
         TaxesPayerNumber = TaxesPayerNumberGenerator(InvalidTaxPayerRatio)
@@ -117,12 +122,13 @@ try:
         PhoneNumber = random.randrange(111111111, 999999999)
         _user.PhoneNumber = "'+" + str(PhoneNumber)
 
-        Users.append(_user)
+        Users.add(_user)
+        i = len(Users)
 
         #Here we calculating the completion of task in percents
         #We'll display each 10 percents completion of task (if you would like to change it, you need to change the 10 in (Amount // 10) part (Higher value - more often you see percentage))
-        if (i + 1) % (Amount // 10) == 0:
-            PercentComplete = (i + 1) * 100 // Amount
+        if (i) % (Amount // 20) == 0:
+            PercentComplete = (i) * 100 // Amount
             print( GetCurrentDateTime_FormattedString() + "     " + f"{PercentComplete}% Completed")
 
 
