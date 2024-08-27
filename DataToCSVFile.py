@@ -161,7 +161,7 @@ try:
         # Here we calculating the completion of task in percents
         # It'll display each 5 percents completion of task 
         # if you would like to change it, you need to change the 20 in (Amount // 20) part (Higher value - more often you see percentage. Max value - 100)
-        if (i) % (Amount // 100) == 0:
+        if (i) % (Amount // 20) == 0:
             PercentComplete = (i) * 100 // Amount
             print( GetCurrentDateTime_FormattedString() + "     " + f"{PercentComplete}% Completed")
 

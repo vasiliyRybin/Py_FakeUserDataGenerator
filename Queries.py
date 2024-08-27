@@ -4,4 +4,4 @@ CreateUsersTable = "CREATE TABLE Users(FirstName TEXT, LastName TEXT, PhoneNumbe
 
 InsertNewUsers = "INSERT INTO Users VALUES(:FirstName, :LastName, :PhoneNumber, :Email, :TaxID, :PassNumber, :Comment)"
 
-GetAllUsers = ""
+GetAllUsers = "SELECT * FROM Users"
