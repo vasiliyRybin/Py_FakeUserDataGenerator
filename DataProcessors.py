@@ -12,14 +12,16 @@ def CheckUsersTableAvailability(PathToDBFile):
     Connection.close()
     return IsTableAvailable
 
-def GetAllUsersData(PathToDBFile):
-    Connection = sqlite3.connect(PathToDBFile)
-    Cursor = Connection.cursor()   
+def GetAllDataFromSomeTable(PathToDBFile, Query):
+    if Query.strip().lower().startswith("select"):        
+        Connection = sqlite3.connect(PathToDBFile)
+        Cursor = Connection.cursor()   
     
-    UsersData = Cursor.execute(GetAllUsers).fetchall()
+        UsersData = Cursor.execute(Query).fetchall()
     
-    Connection.close()
-    return UsersData
+        Connection.close()
+        return UsersData
+    return []
 
 
 def WriteInfoToFile(Users, PathToCSVFile):    

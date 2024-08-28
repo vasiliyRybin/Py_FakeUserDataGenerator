@@ -5,8 +5,9 @@ import names
 
 from datetime import datetime
 from UserClass import User
+from Queries import GetAllTaxAndPassNumbers
 from DataGenerators import TaxesPayerNumberGenerator, KurwaPassNumberGenerator
-from DataProcessors import WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources, CheckUsersTableAvailability, GetAllUsersData
+from DataProcessors import WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources, CheckUsersTableAvailability, GetAllDataFromSomeTable
 
 def PathToCurrentFile():
     return os.path.abspath(__file__)
@@ -124,9 +125,9 @@ try:
     if OutputTo in [1, 2]:
         IsUsersTableExists = CheckUsersTableAvailability(Paths["PathToDB"])
         if IsUsersTableExists:
-            UsersData = GetAllUsersData(Paths["PathToDB"])
-            [Old_TaxesPayerNumbersSet.add(record[4]) for record in UsersData]
-            [Old_PassNumbersSet.add(record[5]) for record in UsersData]
+            UsersData = GetAllDataFromSomeTable(Paths["PathToDB"], GetAllTaxAndPassNumbers)
+            [Old_TaxesPayerNumbersSet.add(record[0]) for record in UsersData]
+            [Old_PassNumbersSet.add(record[1]) for record in UsersData]
 
     
     i = StartIndex   
