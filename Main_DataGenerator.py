@@ -1,12 +1,12 @@
-﻿from DataGenerators import TaxesPayerNumberGenerator, KurwaPassNumberGenerator
-from DataWriters import WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources
-from UserClass import User
-from datetime import datetime
-import sqlite3
-import os
+﻿import os
 import random
 import sys
 import names
+
+from datetime import datetime
+from UserClass import User
+from DataGenerators import TaxesPayerNumberGenerator, KurwaPassNumberGenerator
+from DataWriters import WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources
 
 def PathToCurrentFile():
     return os.path.abspath(__file__)
@@ -24,19 +24,21 @@ def CalculateExecutionTime(StartTime):
     return f"{ElapsedHours}:{ElapsedMinutes}:{ElapsedSeconds}.{ElapsedMilliseconds}"
 
 
-StartIndex = 0
-ExecutionPath = PathToCurrentFile()
-FileDirectory = ExecutionPath[StartIndex:ExecutionPath.rfind("\\") + 1]
-ValidTaxesPayerNumber_LowerValue = 1000000000
-ValidTaxesPayerNumber_MaxValue = 9999999999
-
-Paths = {
-            "PathToDB" : FileDirectory + "TestUserData.db",
-            "PathToCSV" : FileDirectory + "TestUserData.csv",
-            "PathToLog" : FileDirectory + "Log.txt"
-        }
-
+#App main initialization
 try:
+    StartIndex = 0
+    ExecutionPath = PathToCurrentFile()
+    FileDirectory = ExecutionPath[StartIndex:ExecutionPath.rfind("\\") + 1]
+
+    Paths = {
+                "PathToDB" : FileDirectory + "TestUserData.db",
+                "PathToCSV" : FileDirectory + "TestUserData.csv",
+                "PathToLog" : FileDirectory + "Log.txt"
+            }
+
+    
+    ValidTaxesPayerNumber_LowerValue = 1000000000
+    ValidTaxesPayerNumber_MaxValue = 9999999999
     AppName = sys.argv[0]
     Arguments = sys.argv[1:]
     InvalidTaxPayerRatio = None
@@ -47,6 +49,7 @@ try:
     DefaultOutputTo = 0
     StartTime = datetime.now()
     EndTime = datetime.now()
+    
     print("Process started at " + GetCurrentDateTime_FormattedString())
     
     for item in Arguments:
@@ -97,13 +100,33 @@ try:
     print("Amount of data to be generated: " + str(Amount) + "\n")
 
     Users = set()
-    i = 0
+    TaxesPayerNumbersSet = set()
+    PassNumbersSet = set()
 
+    while len(TaxesPayerNumbersSet) < Amount:
+        taxes_payer_number = TaxesPayerNumberGenerator(InvalidTaxPayerRatio, ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
+        TaxesPayerNumbersSet.add(taxes_payer_number)
+
+    print(GetCurrentDateTime_FormattedString() + "     " + "Unique tax numbers were generated")
+    while len(PassNumbersSet) < Amount:        
+        pass_number = KurwaPassNumberGenerator()
+        PassNumbersSet.add(pass_number)
+    
+    print(GetCurrentDateTime_FormattedString() + "     " + "Unique pass numbers were generated")
+     
+    TaxesPayerNumbersList = list(TaxesPayerNumbersSet)
+    PassNumbersList = list(PassNumbersSet)
+
+    # deleting the initial sets to free the memory
+    del TaxesPayerNumbersSet
+    del PassNumbersSet
+    
+    i = 0   
     while i < Amount:
         FirstName = names.get_first_name()
         LastName = names.get_last_name()
-        TaxesPayerNumber = TaxesPayerNumberGenerator(Users, InvalidTaxPayerRatio, ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
-        PassNumber = KurwaPassNumberGenerator(Users)
+        TaxesPayerNumber = TaxesPayerNumbersList[i]
+        PassNumber = PassNumbersList[i]
         _user = User(FirstName, LastName, TaxesPayerNumber, PassNumber)
     
         Email = FirstName.lower() + "." + LastName.lower() + "@test.com"
@@ -124,7 +147,7 @@ try:
             PercentComplete = (i) * 100 // Amount
             print( GetCurrentDateTime_FormattedString() + "     " + f"{PercentComplete}% Completed")
 
-    
+
     if OutputTo == 0:
         WriteInfoToFile(Users, Paths["PathToCSV"])
         print("File with test data was successfully created and can be found in " + Paths["PathToCSV"] + "\n")
