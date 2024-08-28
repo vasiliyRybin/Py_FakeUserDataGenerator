@@ -1,6 +1,26 @@
-﻿from Queries import CreateUsersTable, InsertNewUsers, Check_UsersTableExists
+﻿from Queries import CreateUsersTable, InsertNewUsers, Check_UsersTableExists, GetAllUsers
 import sqlite3
 import csv
+
+def CheckUsersTableAvailability(PathToDBFile):
+    Connection = sqlite3.connect(PathToDBFile)
+    Cursor = Connection.cursor()   
+    
+    GetTable = Cursor.execute(Check_UsersTableExists).fetchone()
+    IsTableAvailable = False if GetTable is None else True
+    
+    Connection.close()
+    return IsTableAvailable
+
+def GetAllUsersData(PathToDBFile):
+    Connection = sqlite3.connect(PathToDBFile)
+    Cursor = Connection.cursor()   
+    
+    UsersData = Cursor.execute(GetAllUsers).fetchall()
+    
+    Connection.close()
+    return UsersData
+
 
 def WriteInfoToFile(Users, PathToCSVFile):    
     with open(PathToCSVFile, mode="a+", encoding="utf-8-sig", newline='') as CsvFile:
@@ -43,6 +63,7 @@ def WriteInfoToDB(Users, PathToDBFile):
         
     Cursor.executemany(InsertNewUsers, users_data)
     Connection.commit()
+    Connection.close()
 
 def WriteInfoToAllOutputSources(Users, Paths):
     WriteInfoToFile(Users, Paths["PathToCSV"])

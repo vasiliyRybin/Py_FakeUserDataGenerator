@@ -6,7 +6,7 @@ import names
 from datetime import datetime
 from UserClass import User
 from DataGenerators import TaxesPayerNumberGenerator, KurwaPassNumberGenerator
-from DataWriters import WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources
+from DataProcessors import WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources, CheckUsersTableAvailability, GetAllUsersData
 
 def PathToCurrentFile():
     return os.path.abspath(__file__)
@@ -85,7 +85,7 @@ try:
         
         # 0 - write to CSV file
         # 1 - Write to DB
-        # 2 - Both options (To CSV and DB)        
+        # 2 - Both options (To CSV and DB)
         elif item.startswith("output_to"):
             value = item.split(":")[1]
             if value.isdigit():
@@ -114,25 +114,47 @@ try:
     TaxesPayerNumbersSet = set()
     PassNumbersSet = set()
 
-    while len(TaxesPayerNumbersSet) < Amount:
-        taxes_payer_number = TaxesPayerNumberGenerator(InvalidTaxPayerRatio, ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
-        TaxesPayerNumbersSet.add(taxes_payer_number)
-
-    LogToConsole("Unique tax numbers were generated")
-    while len(PassNumbersSet) < Amount:        
-        pass_number = KurwaPassNumberGenerator()
-        PassNumbersSet.add(pass_number)
+    # Here we're checking the value of input parameter OutputTo. When it's 1 or 2, then checking if DB and Users table already existing
+    # If table exists, grab all the data from it and then fill the Old_TaxesPayerNumbersSet and Old_PassNumbersSet with already generated data
+    # Purpose of implementation this feature: would like to have definitely unique Pass numbers and Tax payers numbers
     
+    Old_TaxesPayerNumbersSet = set()
+    Old_PassNumbersSet = set()
+    
+    if OutputTo in [1, 2]:
+        IsUsersTableExists = CheckUsersTableAvailability(Paths["PathToDB"])
+        if IsUsersTableExists:
+            UsersData = GetAllUsersData(Paths["PathToDB"])
+            [Old_TaxesPayerNumbersSet.add(record[4]) for record in UsersData]
+            [Old_PassNumbersSet.add(record[5]) for record in UsersData]
+
+    
+    i = StartIndex   
+    while i < Amount:
+        taxes_payer_number = TaxesPayerNumberGenerator(InvalidTaxPayerRatio, ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
+        if taxes_payer_number not in Old_TaxesPayerNumbersSet:
+            TaxesPayerNumbersSet.add(taxes_payer_number)
+            i = len(TaxesPayerNumbersSet)
+    LogToConsole("Unique tax numbers were generated")
+    
+    i = StartIndex
+    while i < Amount:        
+        pass_number = KurwaPassNumberGenerator()
+        if pass_number not in Old_PassNumbersSet:
+            PassNumbersSet.add(pass_number)
+            i = len(PassNumbersSet)
     LogToConsole("Unique pass numbers were generated")
      
     TaxesPayerNumbersList = list(TaxesPayerNumbersSet)
     PassNumbersList = list(PassNumbersSet)
 
     # deleting the initial sets to free the memory
+    del Old_PassNumbersSet
+    del Old_TaxesPayerNumbersSet
     del TaxesPayerNumbersSet
     del PassNumbersSet
-    
-    i = 0   
+     
+    i = StartIndex
     while i < Amount:
         FirstName = names.get_first_name()
         LastName = names.get_last_name()
@@ -154,7 +176,8 @@ try:
         # Here we calculating the completion of task in percents
         # It'll display each 5 percents completion of task 
         # if you would like to change it, you need to change the 20 in (Amount // 20) part (Higher value - more often you see percentage. Max value - 100)
-        if (i) % (Amount // 20) == 0:
+        DivisionRemainder = Amount // 20
+        if DivisionRemainder > 0 and i % DivisionRemainder == 0:
             PercentComplete = (i) * 100 // Amount
             LogToConsole(f"{PercentComplete}% Completed")
 
@@ -164,10 +187,10 @@ try:
         LogToConsole("File with test data was successfully created and can be found in " + Paths["PathToCSV"] + "\n")
     elif OutputTo == 1:
         WriteInfoToDB(Users, Paths["PathToDB"])
-        LogToConsole("File with test data was successfully created and can be found in " + Paths["PathToDB"] + "\n")
+        LogToConsole("File with test data was successfully created/updated and can be found in " + Paths["PathToDB"] + "\n")
     elif OutputTo == 2:
         WriteInfoToAllOutputSources(Users, Paths)
-        LogToConsole("Files with test data was successfully created and can be found in " + FileDirectory + "\n")
+        LogToConsole("Files with test data was successfully created/updated and can be found in " + FileDirectory + "\n")
         
 
 except Exception as ex:
