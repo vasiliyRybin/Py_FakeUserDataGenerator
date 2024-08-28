@@ -7,7 +7,7 @@ from datetime import datetime
 from UserClass import User
 from Queries import GetAllTaxAndPassNumbers
 from DataGenerators import TaxesPayerNumberGenerator, KurwaPassNumberGenerator
-from DataProcessors import WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources, CheckUsersTableAvailability, GetAllDataFromSomeTable
+from DataProcessors import GetSomeValueFromSomeTable, WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources, CheckUsersTableAvailability, GetAllDataFromSomeTable
 
 def PathToCurrentFile():
     return os.path.abspath(__file__)
@@ -117,7 +117,7 @@ try:
 
     # Here we're checking the value of input parameter OutputTo. When it's 1 or 2, then checking if DB and Users table already existing
     # If table exists, grab all the data from it and then fill the Old_TaxesPayerNumbersSet and Old_PassNumbersSet with already generated data
-    # Purpose of implementation this feature: would like to have definitely unique Pass numbers and Tax payers numbers
+    # Purpose of implementation this feature: would like to have definitely unique Pass numbers and Tax payers numbers (and to practice some Python skill ofc :D )
     
     Old_TaxesPayerNumbersSet = set()
     Old_PassNumbersSet = set()
@@ -131,6 +131,9 @@ try:
 
     
     i = StartIndex   
+    #TODO
+    test = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "TaxID", 9999996275)
+    
     while i < Amount:
         taxes_payer_number = TaxesPayerNumberGenerator(InvalidTaxPayerRatio, ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
         if taxes_payer_number not in Old_TaxesPayerNumbersSet:

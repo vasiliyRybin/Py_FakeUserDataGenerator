@@ -1,4 +1,4 @@
-﻿from Queries import CreateUsersTable, InsertNewUsers, Check_UsersTableExists, GetAllUsers
+﻿from Queries import CreateUsersTable, InsertNewUsers, Check_UsersTableExists, GetSomeValueFromSomeTable_ReturnNumberOfRows
 import sqlite3
 import csv
 
@@ -23,6 +23,21 @@ def GetAllDataFromSomeTable(PathToDBFile, Query):
         return UsersData
     return []
 
+def GetSomeValueFromSomeTable(PathToDBFile, TableName, ColumnName, Value):
+    PathToDBFile = str(PathToDBFile)
+    TableName = str(TableName)
+    ColumnName = str(ColumnName)
+    Value = str(Value)
+    
+    Connection = sqlite3.connect(PathToDBFile)
+    Cursor = Connection.cursor()   
+    
+    Query = GetSomeValueFromSomeTable_ReturnNumberOfRows.replace("@col", ColumnName).replace("@tbl", TableName).replace("@value", Value)
+
+    Result = int(Cursor.execute(Query).fetchone()[0])
+    
+    Connection.close()
+    return Result
 
 def WriteInfoToFile(Users, PathToCSVFile):    
     with open(PathToCSVFile, mode="a+", encoding="utf-8-sig", newline='') as CsvFile:
