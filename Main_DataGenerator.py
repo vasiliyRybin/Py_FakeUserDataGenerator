@@ -58,12 +58,13 @@ try:
     InvalidTaxPayerRatio = None
     Amount = None
     OutputTo = None
-    DefaultAmount = 50
-    DefaultInvalidTaxPayerRatio = 10
-    DefaultOutputTo = 0
+    DefaultValue_Amount = 5000
+    DefaultValue_InvalidTaxPayerRatio = 10
+    DefaultValue_OutputTo = 1
     
     LogToConsole("Process started")
     
+    #Arguments verification part
     for item in Arguments:
         
         if item.startswith("amount:"):
@@ -71,16 +72,16 @@ try:
             if value.isdigit():
                 Amount = int(value)
             else:
-                LogToConsole("Parameter 'amount:' having wrong value. Using default value... \n")
-                Amount = DefaultAmount
+                LogToConsole(f"Parameter 'amount:' having wrong value. Using default value of {DefaultValue_Amount} \n")
+                Amount = DefaultValue_Amount
         
         elif item.startswith("invalid_tax_id_ratio"):
             value = item.split(":")[1]
             if value.isdigit():
                 InvalidTaxPayerRatio = int(value)
             else:
-                LogToConsole("Parameter 'invalid_tax_id_ratio:' having wrong value. Using default value... \n")
-                InvalidTaxPayerRatio = DefaultInvalidTaxPayerRatio
+                LogToConsole(f"Parameter 'invalid_tax_id_ratio:' having wrong value. Using default value of {DefaultValue_InvalidTaxPayerRatio} \n")
+                InvalidTaxPayerRatio = DefaultValue_InvalidTaxPayerRatio
         
         # 0 - write to CSV file
         # 1 - Write to DB
@@ -90,25 +91,23 @@ try:
             if value.isdigit():
                 OutputTo = int(value)
             else:
-                LogToConsole("Parameter 'invalid_tax_id_ratio:' having wrong value. Using default value... \n")
-                OutputTo = DefaultInvalidTaxPayerRatio
+                LogToConsole(f"Parameter 'invalid_tax_id_ratio:' having wrong value. Using default value of {DefaultValue_OutputTo} \n")
+                OutputTo = DefaultValue_OutputTo
             
 
-    if Amount == None:
-        LogToConsole("Parameter 'amount:' was not found. Using default value of 50 \n")
-        Amount = DefaultAmount
-    elif InvalidTaxPayerRatio == None:
-        LogToConsole("Parameter 'invalid_tax_id_ratio:' was not found. Using default value of 10 \n")
-        InvalidTaxPayerRatio = DefaultInvalidTaxPayerRatio
-    elif OutputTo == None:
-        LogToConsole("Parameter 'output_to:' was not found. Using default value of 0 \n")
-        InvalidTaxPayerRatio = DefaultInvalidTaxPayerRatio
+    if Amount == None or Amount <= 0:
+        LogToConsole(f"Parameter 'amount:' was not found or having wrong value. Using default value of {DefaultValue_Amount} \n")
+        Amount = DefaultValue_Amount
     
-    if InvalidTaxPayerRatio > 100:
-        InvalidTaxPayerRatio = 100
-    elif InvalidTaxPayerRatio < 0:
-        InvalidTaxPayerRatio = 1
-            
+    if InvalidTaxPayerRatio == None or InvalidTaxPayerRatio > 100 or InvalidTaxPayerRatio < 0:
+        LogToConsole(f"Parameter 'invalid_tax_id_ratio:' was not found or having wrong value. Using default value of {DefaultValue_InvalidTaxPayerRatio} \n")
+        InvalidTaxPayerRatio = DefaultValue_InvalidTaxPayerRatio
+    
+    if OutputTo == None or OutputTo > 2 or OutputTo < 0:
+        LogToConsole(f"Parameter 'output_to:' was not found or having wrong value. Using default value of {DefaultValue_OutputTo} \n")
+        OutputTo = DefaultValue_OutputTo
+    #End of arguments verification part
+        
     LogToConsole("Amount of data to be generated: " + str(Amount) + "\n")
 
     Users = set()
