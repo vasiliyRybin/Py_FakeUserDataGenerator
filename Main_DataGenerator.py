@@ -1,5 +1,5 @@
-﻿from Queries import CreateUsersTable, InsertNewUsers, Check_UsersTableExists
-from DataGenerators import TaxesPayerNumberGenerator, KurwaPassNumberGenerator
+﻿from DataGenerators import TaxesPayerNumberGenerator, KurwaPassNumberGenerator
+from DataWriters import WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources
 from UserClass import User
 from datetime import datetime
 import sqlite3
@@ -7,7 +7,6 @@ import os
 import random
 import sys
 import names
-import csv
 
 def PathToCurrentFile():
     return os.path.abspath(__file__)
@@ -25,57 +24,17 @@ def CalculateExecutionTime(StartTime):
     return f"{ElapsedHours}:{ElapsedMinutes}:{ElapsedSeconds}.{ElapsedMilliseconds}"
 
 
-def WriteInfoToFile():    
-    with open(PathTofile, mode="a+", encoding="utf-8-sig", newline='') as CsvFile:
-        FieldNames = ["First name", "Last name", "Phone number", "Email", "Tax payer number", "Pass number", "Comment"]
-        writer = csv.DictWriter(CsvFile, fieldnames=FieldNames, extrasaction="ignore", delimiter=";")
-        writer.writeheader()
-
-        for user in Users:
-            writer.writerow(
-                             {
-                                 "First name": user.FirstName, 
-                                 "Last name" : user.LastName,
-                                 "Phone number" : user.PhoneNumber,
-                                 "Email" : user.Email,
-                                 "Tax payer number" : user.TaxesPayerNumber,
-                                 "Pass number" : user.PassNumber,
-                                 "Comment" : user.Comment
-                             }
-                           )
-def WriteInfoToDB():
-    Connection = sqlite3.connect(PathToDBfile)
-    Cursor = Connection.cursor()
-    
-    IsUsersExists = Cursor.execute(Check_UsersTableExists).fetchone()
-
-    if IsUsersExists == None:
-        Cursor.execute(CreateUsersTable)
-    
-    users_data = [
-                    {
-                        'FirstName': user.FirstName,
-                        'LastName': user.LastName,
-                        'PhoneNumber': user.PhoneNumber.replace('\'', ''),
-                        'Email': user.Email,
-                        'TaxID': user.TaxesPayerNumber,
-                        'PassNumber': user.PassNumber,
-                        'Comment': user.Comment
-                    } 
-                    for user in Users]
-        
-    Cursor.executemany(InsertNewUsers, users_data)
-    Connection.commit()
-
-
 StartIndex = 0
 ExecutionPath = PathToCurrentFile()
 FileDirectory = ExecutionPath[StartIndex:ExecutionPath.rfind("\\") + 1]
-PathTofile = FileDirectory + "TestUserData.csv"
-PathToDBfile = FileDirectory + "TestUserData.db"
-PathToLog = FileDirectory + "Log.txt"
 ValidTaxesPayerNumber_LowerValue = 1000000000
 ValidTaxesPayerNumber_MaxValue = 9999999999
+
+Paths = {
+            "PathToDB" : FileDirectory + "TestUserData.db",
+            "PathToCSV" : FileDirectory + "TestUserData.csv",
+            "PathToLog" : FileDirectory + "Log.txt"
+        }
 
 try:
     AppName = sys.argv[0]
@@ -167,20 +126,19 @@ try:
 
     
     if OutputTo == 0:
-        WriteInfoToFile()
-        print("File with test data was successfully created and can be found in " + PathTofile + "\n")
+        WriteInfoToFile(Users, Paths["PathToCSV"])
+        print("File with test data was successfully created and can be found in " + Paths["PathToCSV"] + "\n")
     elif OutputTo == 1:
-        WriteInfoToDB()
-        print("File with test data was successfully created and can be found in " + PathToDBfile + "\n")
+        WriteInfoToDB(Users, Paths["PathToDB"])
+        print("File with test data was successfully created and can be found in " + Paths["PathToDB"] + "\n")
     elif OutputTo == 2:
-        WriteInfoToFile()
-        WriteInfoToDB()
+        WriteInfoToAllOutputSources(Users, Paths)
         print("Files with test data was successfully created and can be found in " + FileDirectory + "\n")
         
 
 except Exception as ex:
     print(str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + "\t" + str(ex))
-    with open(PathToLog, mode="a+", encoding="utf-8") as ErrorLog:
+    with open(Paths["PathToLog"], mode="a+", encoding="utf-8") as ErrorLog:
         ErrorLog.write(str(datetime.now().strftime('%Y-%m-%d %H:%M:%S')) + "\t" + str(ex))
         ErrorLog.write("\n")
 finally:
