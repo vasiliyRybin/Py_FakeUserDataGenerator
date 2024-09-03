@@ -170,7 +170,7 @@ try:
         
         if IsUsersTableExists:
             
-            #Been implemented logic to check if users table exists, check if user with such email exists. If such email exists - generate new email
+            # Been implemented logic to check if users table exists, check if user with such email exists. If such email exists - generate new email with postfix random letters
             EmailInDBCount = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "Email", Email)
         
             while EmailInDBCount > 0: 
