@@ -34,7 +34,7 @@ def GetSomeValueFromSomeTable(PathToDBFile, TableName, ColumnName, Value):
     
     Query = GetSomeValueFromSomeTable_ReturnNumberOfRows.replace("@col", ColumnName).replace("@tbl", TableName).replace("@value", Value)
 
-    Result = int(Cursor.execute(Query).fetchone()[0])
+    Result = Cursor.execute(Query).fetchone()[0]
     
     Connection.close()
     return Result

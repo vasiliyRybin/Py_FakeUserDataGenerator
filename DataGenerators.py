@@ -7,7 +7,7 @@ def TaxesPayerNumberGenerator(InvalidTaxPayerRatio, ValidTaxesPayerNumber_LowerV
         #Here's would be generated invalid TaxPayerNumber
         return random.randrange(0, ValidTaxesPayerNumber_LowerValue - 1) 
     
-def KurwaPassNumberGenerator():
-    Letters = "AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUWYZŹŻ"
+def KurwaPassNumberGenerator(Letters):
+    Letters = str(Letters)
     Letter = Letters[random.randrange(0, len(Letters) - 1)]
     return "ZZ" + Letter + str(random.randrange(100000, 999999))   

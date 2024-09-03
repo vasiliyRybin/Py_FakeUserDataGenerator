@@ -15,4 +15,5 @@
         return False
 
     def __hash__(self):
-        return hash((self.TaxesPayerNumber, self.PassNumber))
+        PrimeNumber = 23
+        return (hash(self.TaxesPayerNumber) * PrimeNumber + hash(self.PassNumber) * PrimeNumber)

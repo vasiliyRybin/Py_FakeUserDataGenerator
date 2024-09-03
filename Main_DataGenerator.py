@@ -40,6 +40,7 @@ def CalculateExecutionTime(StartTime):
 
 #App main initialization
 try:
+    Letters = "AĄBCĆDEĘFGHIJKLŁMNŃOÓPRSŚTUWYZŹŻ"
     StartTime = datetime.now()
     EndTime = datetime.now()
     StartIndex = 0
@@ -131,8 +132,6 @@ try:
 
     
     i = StartIndex   
-    #TODO
-    test = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "TaxID", 9999996275)
     
     while i < Amount:
         taxes_payer_number = TaxesPayerNumberGenerator(InvalidTaxPayerRatio, ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
@@ -143,7 +142,7 @@ try:
     
     i = StartIndex
     while i < Amount:        
-        pass_number = KurwaPassNumberGenerator()
+        pass_number = KurwaPassNumberGenerator(Letters)
         if pass_number not in Old_PassNumbersSet:
             PassNumbersSet.add(pass_number)
             i = len(PassNumbersSet)
@@ -160,13 +159,30 @@ try:
      
     i = StartIndex
     while i < Amount:
+        EmailInDBCount = 0    
         FirstName = names.get_first_name()
         LastName = names.get_last_name()
         TaxesPayerNumber = TaxesPayerNumbersList[i]
         PassNumber = PassNumbersList[i]
         _user = User(FirstName, LastName, TaxesPayerNumber, PassNumber)
     
-        Email = FirstName.lower() + "." + LastName.lower() + "@test.com"
+        Email = FirstName.lower() + "." + LastName.lower() + "@test.com"  
+        
+        if IsUsersTableExists:
+            
+            #Been implemented logic to check if users table exists, check if user with such email exists. If such email exists - generate new email
+            EmailInDBCount = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "Email", Email)
+        
+            while EmailInDBCount > 0: 
+                Postfix = Letters[random.randrange(0, len(Letters) - 1)] + Letters[random.randrange(0, len(Letters) - 1)] + Letters[random.randrange(0, len(Letters) - 1)]
+                NewEmail = FirstName.lower() + "." + LastName.lower() + "_" + Postfix.lower() + "@test.com" 
+                
+                #LogToConsole(f"Email {Email} already exists in DB. New email is: {NewEmail}")   
+                
+                EmailInDBCount = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "Email", NewEmail)
+                Email = NewEmail
+                
+
         _user.Email = Email
     
         PhoneNumber = random.randrange(111111111, 999999999)
