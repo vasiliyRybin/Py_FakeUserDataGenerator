@@ -175,11 +175,9 @@ try:
     
         Email = FirstName.lower() + "." + LastName.lower() + "@test.com"  
         
-        if IsUsersTableExists:
-            
-            # Been implemented logic to check if users table exists, check if user with such email exists. If such email exists - generate new email with postfix random letters
+        # Been implemented logic to check if users table exists, check if user with such email exists too. If such email exists - generate new email with 3 random letters as postfix            
+        if IsUsersTableExists:            
             EmailInDBCount = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "Email", Email)
-            #EmailInDBCount = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "Email", Email)
         
             while EmailInDBCount > 0 and any(user.Email == Email for user in Users): 
                 Postfix = Letters[random.randrange(0, len(Letters) - 1)] + Letters[random.randrange(0, len(Letters) - 1)] + Letters[random.randrange(0, len(Letters) - 1)]
