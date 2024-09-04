@@ -9,3 +9,7 @@ InsertNewUsers = "INSERT INTO Users VALUES(:FirstName, :LastName, :PhoneNumber, 
 GetAllUsers = "SELECT * FROM Users"
 
 GetAllTaxAndPassNumbers = "SELECT TaxID, PassNumber FROM Users"
+
+MaintainIndex_DropIdx = "DROP INDEX IF EXISTS @idx_name;"
+MaintainIndex_CreateIdx = "CREATE INDEX @idx_name ON @tbl_name(@col_name);"
+MaintainDB_VacuumDB = "VACUUM;"

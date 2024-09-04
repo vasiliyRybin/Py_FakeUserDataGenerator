@@ -7,7 +7,7 @@ from datetime import datetime
 from UserClass import User
 from Queries import GetAllTaxAndPassNumbers
 from DataGenerators import TaxesPayerNumberGenerator, KurwaPassNumberGenerator
-from DataProcessors import GetSomeValueFromSomeTable, WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources, CheckUsersTableAvailability, GetAllDataFromSomeTable
+from DataProcessors import GetSomeValueFromSomeTable, WriteInfoToFile, WriteInfoToDB, WriteInfoToAllOutputSources, CheckUsersTableAvailability, GetAllDataFromSomeTable, MaintainUsersTable
 
 def PathToCurrentFile():
     return os.path.abspath(__file__)
@@ -37,6 +37,15 @@ def CalculateExecutionTime(StartTime):
     ElapsedHours = int(ExecutionTime.seconds / 60 / 60) if int(ExecutionTime.seconds / 60 / 60) > 9 else "0" + str(int(ExecutionTime.seconds / 60 / 60))
     return f"{ElapsedHours}:{ElapsedMinutes}:{ElapsedSeconds}.{ElapsedMilliseconds}"
 
+
+# Here we calculating the completion of task in percents
+# It'll display each 5 percents completion of task 
+# if you would like to change it, you need to change the 20 in (Amount // 20) part (Higher value - more often you see percentage. Max value - 100)
+def CalculateTaskCompletion(Amount):
+    DivisionRemainder = Amount // 20
+    if DivisionRemainder > 0 and i % DivisionRemainder == 0:
+        PercentComplete = (i) * 100 // Amount
+        LogToConsole(f"{PercentComplete}% Completed")
 
 #App main initialization
 try:
@@ -129,10 +138,8 @@ try:
             UsersData = GetAllDataFromSomeTable(Paths["PathToDB"], GetAllTaxAndPassNumbers)
             [Old_TaxesPayerNumbersSet.add(record[0]) for record in UsersData]
             [Old_PassNumbersSet.add(record[1]) for record in UsersData]
-
     
-    i = StartIndex   
-    
+    i = StartIndex       
     while i < Amount:
         taxes_payer_number = TaxesPayerNumberGenerator(InvalidTaxPayerRatio, ValidTaxesPayerNumber_LowerValue, ValidTaxesPayerNumber_MaxValue)
         if taxes_payer_number not in Old_TaxesPayerNumbersSet:
@@ -173,7 +180,7 @@ try:
             # Been implemented logic to check if users table exists, check if user with such email exists. If such email exists - generate new email with postfix random letters
             EmailInDBCount = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "Email", Email)
         
-            while EmailInDBCount > 0: 
+            while EmailInDBCount > 0 and any(user.Email == Email for user in Users): 
                 Postfix = Letters[random.randrange(0, len(Letters) - 1)] + Letters[random.randrange(0, len(Letters) - 1)] + Letters[random.randrange(0, len(Letters) - 1)]
                 NewEmail = FirstName.lower() + "." + LastName.lower() + "_" + Postfix.lower() + "@test.com" 
                 
@@ -192,14 +199,7 @@ try:
 
         Users.add(_user)
         i = len(Users)
-
-        # Here we calculating the completion of task in percents
-        # It'll display each 5 percents completion of task 
-        # if you would like to change it, you need to change the 20 in (Amount // 20) part (Higher value - more often you see percentage. Max value - 100)
-        DivisionRemainder = Amount // 20
-        if DivisionRemainder > 0 and i % DivisionRemainder == 0:
-            PercentComplete = (i) * 100 // Amount
-            LogToConsole(f"{PercentComplete}% Completed")
+        CalculateTaskCompletion(Amount)
 
 
     if OutputTo == 0:
@@ -221,5 +221,8 @@ except Exception as ex:
 finally:
     TotalExecutionTime = CalculateExecutionTime(StartTime)
     
+    if IsUsersTableExists:
+        MaintainUsersTable(Paths["PathToDB"], "IX_Email", "Users", "Email")
+
     LogToConsole("Process finished")
     LogToConsole("Execution time: " + TotalExecutionTime + "\n")

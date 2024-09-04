@@ -1,4 +1,4 @@
-﻿from Queries import CreateUsersTable, InsertNewUsers, Check_UsersTableExists, GetSomeValueFromSomeTable_ReturnNumberOfRows
+﻿from Queries import CreateUsersTable, InsertNewUsers, Check_UsersTableExists, GetSomeValueFromSomeTable_ReturnNumberOfRows, MaintainIndex_DropIdx, MaintainIndex_CreateIdx, MaintainDB_VacuumDB
 import sqlite3
 import csv
 
@@ -85,3 +85,26 @@ def WriteInfoToDB(Users, PathToDBFile):
 def WriteInfoToAllOutputSources(Users, Paths):
     WriteInfoToFile(Users, Paths["PathToCSV"])
     WriteInfoToDB(Users, Paths["PathToDB"])
+    
+
+def MaintainUsersTable(PathToDBFile, IndexName, TableName, ColumnName):
+    Connection = sqlite3.connect(PathToDBFile)
+    Cursor = Connection.cursor()
+    
+    IsUsersExists = Cursor.execute(Check_UsersTableExists).fetchone()
+
+    if IsUsersExists == None:
+        Cursor.execute(CreateUsersTable)    
+        
+    # Query_DropIdx = MaintainIndex_DropIdx.replace("@col_name", ColumnName).replace("@tbl_name", TableName).replace("@idx_name", IndexName)
+    
+    Query_DropIdx = MaintainIndex_DropIdx.replace("@idx_name", IndexName)    
+    Query_CreateIdx = MaintainIndex_CreateIdx.replace("@col_name", ColumnName).replace("@tbl_name", TableName).replace("@idx_name", IndexName)
+    Query_VacuumDB = MaintainDB_VacuumDB   
+    
+    Cursor.execute(Query_DropIdx).fetchone()
+    Cursor.execute(Query_CreateIdx).fetchone()
+    Cursor.execute(Query_VacuumDB).fetchone()
+    
+    Connection.commit()
+    Connection.close()
