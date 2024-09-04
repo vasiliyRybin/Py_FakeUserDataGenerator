@@ -179,6 +179,7 @@ try:
             
             # Been implemented logic to check if users table exists, check if user with such email exists. If such email exists - generate new email with postfix random letters
             EmailInDBCount = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "Email", Email)
+            #EmailInDBCount = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "Email", Email)
         
             while EmailInDBCount > 0 and any(user.Email == Email for user in Users): 
                 Postfix = Letters[random.randrange(0, len(Letters) - 1)] + Letters[random.randrange(0, len(Letters) - 1)] + Letters[random.randrange(0, len(Letters) - 1)]
