@@ -88,6 +88,11 @@ def WriteInfoToAllOutputSources(Users, Paths):
     
 
 def MaintainUsersTable(PathToDBFile, IndexName, TableName, ColumnName):
+    PathToDBFile = str(PathToDBFile)
+    TableName = str(TableName)
+    IndexName = str(IndexName)
+    ColumnName = str(ColumnName)
+    
     Connection = sqlite3.connect(PathToDBFile)
     Cursor = Connection.cursor()
     
