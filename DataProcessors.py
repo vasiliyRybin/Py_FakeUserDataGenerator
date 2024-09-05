@@ -92,9 +92,9 @@ def WriteInfoToDB(Users, PathToDBFile):
     Connection.commit()
     Connection.close()
 
-def WriteInfoToAllOutputSources(Users, Paths):
+def WriteInfoToAllOutputSources(Users, DBBulkInsertion, Paths):
     WriteInfoToFile(Users, Paths["PathToCSV"])
-    WriteInfoToDB(Users, Paths["PathToDB"])
+    WriteInfoToDB(Users, DBBulkInsertion, Paths["PathToDB"])
     
 
 def MaintainUsersTable(PathToDBFile, IndexName, TableName, ColumnName):

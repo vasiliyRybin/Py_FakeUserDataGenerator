@@ -70,6 +70,9 @@ try:
     Amount = None
     OutputTo = None
     InMemoryProcessing = None
+    DbBulkInsert = None
+    
+    DefaultValue_DbBulkInsert = True
     DefaultValue_InMemoryProcessing = True
     DefaultValue_Amount = 5000
     DefaultValue_InvalidTaxPayerRatio = 10
@@ -118,6 +121,18 @@ try:
             else:
                 LogToConsole(f"Parameter 'in_memory_processing:' having wrong value. Using default value of {DefaultValue_InMemoryProcessing} \n")
                 InMemoryProcessing = DefaultValue_InMemoryProcessing
+                
+        # 0 - Will insert each generated user right after the generation
+        # 1 - First of all we'll collect the set of users and then will write them to the DB (on big amounts of data consuming a lot of RAM)
+        elif item.startswith("data_bulk_insert"):
+            value = item.split(":")[1]
+            if value.strip().isdigit():
+                DbBulkInsert_Value = int(value)
+                if DbBulkInsert_Value == 0: DbBulkInsert = False
+                else: DbBulkInsert = DefaultValue_DbBulkInsert
+            else:
+                LogToConsole(f"Parameter 'data_bulk_insert:' having wrong value. Using default value of {DefaultValue_DbBulkInsert} \n")
+                DbBulkInsert = DefaultValue_DbBulkInsert
             
 
     if Amount == None or Amount <= 0:
@@ -135,6 +150,10 @@ try:
     if InMemoryProcessing == None:
         LogToConsole(f"Parameter 'in_memory_processing:' was not found or having wrong value. Using default value of {DefaultValue_InMemoryProcessing} \n")
         InMemoryProcessing = DefaultValue_InMemoryProcessing
+
+    if DbBulkInsert == None:
+        LogToConsole(f"Parameter 'data_bulk_insert:' was not found or having wrong value. Using default value of {DefaultValue_DbBulkInsert} \n")
+        DbBulkInsert = DefaultValue_DbBulkInsert
     #End of arguments verification part
     
     
@@ -144,7 +163,7 @@ try:
         InMemoryProcessing = DefaultValue_InMemoryProcessing
         
     LogToConsole("Amount of data to be generated: " + str(Amount))
-    LogToConsole(f"Current operating mode: {'In-Memory' if InMemoryProcessing is True else 'DB'}" + "\n")
+    LogToConsole(f"Current operating mode: {'In-Memory' if InMemoryProcessing is True else 'DB'}" + f". Bulk insertion of generated data: {'Activated' if DbBulkInsert is True else 'Deactivated'}")
 
     Users = set()
     TaxesPayerNumbersSet = set()
@@ -208,13 +227,16 @@ try:
         IsEmailExists = False
         
         while True:             
-            if InMemoryProcessing is False: IsEmailExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "Email", Email) or (Email in Old_EmailsSet)
+            if InMemoryProcessing is False and DbBulkInsert is True: IsEmailExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "Email", Email) or (Email in Old_EmailsSet)
+            if InMemoryProcessing is False and DbBulkInsert is False: IsEmailExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "Email", Email)
             elif InMemoryProcessing is True: IsEmailExists = Email in Old_EmailsSet
             
             if IsEmailExists is False:
                 _user.Email = Email
-                Old_EmailsSet.add(Email)
+                if DbBulkInsert is True or InMemoryProcessing is True: 
+                    Old_EmailsSet.add(Email)
                 break
+            
             else:
                 Postfix = ''.join(random.sample(Letters, 5)).lower()
                 Email = FirstName.lower() + "." + LastName.lower() + "_" + Postfix.lower() + "@test.com"
@@ -225,19 +247,27 @@ try:
         _user.Comment = "O kurwa! Popierdolony numer podatnika" if TaxesPayerNumber < ValidTaxesPayerNumber_LowerValue else "" 
 
         Users.add(_user)
-        i = len(Users)
+        if not DbBulkInsert:
+           if OutputTo == 0: WriteInfoToFile(Users, Paths["PathToCSV"])
+           elif OutputTo == 1: WriteInfoToDB(Users, Paths["PathToDB"])
+           elif OutputTo == 2: WriteInfoToAllOutputSources(Users, Paths)
+           
+           Users.clear()
+           i += 1
+        else:
+            i = len(Users)
         CalculateTaskCompletion(Amount)
 
-
-    if OutputTo == 0:
-        WriteInfoToFile(Users, Paths["PathToCSV"])
-        LogToConsole("File with test data was successfully created and can be found in " + Paths["PathToCSV"] + "\n")
-    elif OutputTo == 1:
-        WriteInfoToDB(Users, Paths["PathToDB"])
-        LogToConsole("File with test data was successfully created/updated and can be found in " + Paths["PathToDB"] + "\n")
-    elif OutputTo == 2:
-        WriteInfoToAllOutputSources(Users, Paths)
-        LogToConsole("Files with test data was successfully created/updated and can be found in " + FileDirectory + "\n")
+    if DbBulkInsert:     
+        if OutputTo == 0:
+            WriteInfoToFile(Users, Paths["PathToCSV"])
+            LogToConsole("File with test data was successfully created and can be found in " + Paths["PathToCSV"] + "\n")
+        elif OutputTo == 1:
+            WriteInfoToDB(Users, Paths["PathToDB"])
+            LogToConsole("File with test data was successfully created/updated and can be found in " + Paths["PathToDB"] + "\n")
+        elif OutputTo == 2:
+            WriteInfoToAllOutputSources(Users, Paths)
+            LogToConsole("Files with test data was successfully created/updated and can be found in " + FileDirectory + "\n")
         
 
 except Exception as ex:
