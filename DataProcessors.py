@@ -95,8 +95,6 @@ def MaintainUsersTable(PathToDBFile, IndexName, TableName, ColumnName):
 
     if IsUsersExists == None:
         Cursor.execute(CreateUsersTable)    
-        
-    # Query_DropIdx = MaintainIndex_DropIdx.replace("@col_name", ColumnName).replace("@tbl_name", TableName).replace("@idx_name", IndexName)
     
     Query_DropIdx = MaintainIndex_DropIdx.replace("@idx_name", IndexName)    
     Query_CreateIdx = MaintainIndex_CreateIdx.replace("@col_name", ColumnName).replace("@tbl_name", TableName).replace("@idx_name", IndexName)

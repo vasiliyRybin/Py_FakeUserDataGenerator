@@ -179,7 +179,7 @@ try:
         if IsUsersTableExists:            
             EmailInDBCount = GetSomeValueFromSomeTable(Paths["PathToDB"], "Users", "Email", Email)
         
-            while EmailInDBCount > 0 and any(user.Email == Email for user in Users): 
+            while EmailInDBCount > 0 or any(user.Email == Email for user in Users): 
                 Postfix = Letters[random.randrange(0, len(Letters) - 1)] + Letters[random.randrange(0, len(Letters) - 1)] + Letters[random.randrange(0, len(Letters) - 1)]
                 NewEmail = FirstName.lower() + "." + LastName.lower() + "_" + Postfix.lower() + "@test.com" 
                 
