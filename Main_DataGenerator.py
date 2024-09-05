@@ -75,7 +75,7 @@ try:
     DefaultValue_InvalidTaxPayerRatio = 10
     DefaultValue_OutputTo = 1
     
-    LogToConsole("Process started")
+    LogToConsole("Process started" + "\n")
     
     #Arguments verification part
     for item in Arguments:
@@ -134,27 +134,27 @@ try:
     
     if InMemoryProcessing == None:
         LogToConsole(f"Parameter 'in_memory_processing:' was not found or having wrong value. Using default value of {DefaultValue_InMemoryProcessing} \n")
-        OutputTo = DefaultValue_InMemoryProcessing
+        InMemoryProcessing = DefaultValue_InMemoryProcessing
     #End of arguments verification part
+    
+    
+    IsUsersTableExists = CheckUsersTableAvailability(Paths["PathToDB"])  
+    if not IsUsersTableExists and not InMemoryProcessing:     
+        LogToConsole(f"Users table is unreachable. in_memory_processing set to default value {DefaultValue_InMemoryProcessing}")
+        InMemoryProcessing = DefaultValue_InMemoryProcessing
         
-    LogToConsole("Amount of data to be generated: " + str(Amount) + "\n")
+    LogToConsole("Amount of data to be generated: " + str(Amount))
+    LogToConsole(f"Current operating mode: {'In-Memory' if InMemoryProcessing is True else 'DB'}" + "\n")
 
     Users = set()
     TaxesPayerNumbersSet = set()
     PassNumbersSet = set()
-
-    # Here we're checking the value of input parameter OutputTo. When it's 1 or 2, then checking if DB and Users table already existing
-    # If table exists, grab all the data from it and then fill the Old_TaxesPayerNumbersSet and Old_PassNumbersSet with already generated data
-    # Purpose of implementation this feature: would like to have definitely unique Pass numbers and Tax payers numbers (and to practice some Python skill ofc :D )
-    
-    
+       
     Old_TaxesPayerNumbersSet = set()
     Old_PassNumbersSet = set()
-    Old_EmailsSet = set()
-        
-    IsUsersTableExists = CheckUsersTableAvailability(Paths["PathToDB"])   
+    Old_EmailsSet = set()        
     
-    if OutputTo in [1, 2] and IsUsersTableExists and InMemoryProcessing is True:
+    if IsUsersTableExists and InMemoryProcessing is True:
             UsersData = GetAllDataFromSomeTable(Paths["PathToDB"], "TaxID, PassNumber, Email", "Users")
             [Old_TaxesPayerNumbersSet.add(record[0]) for record in UsersData]
             [Old_PassNumbersSet.add(record[1]) for record in UsersData]
@@ -179,7 +179,7 @@ try:
         IsPassNumberAlreadyExists = False
         pass_number = KurwaPassNumberGenerator(Letters)
 
-        if InMemoryProcessing is False: IsPassNumberAlreadyExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "PassNumber", pass_number)
+        if InMemoryProcessing is False: IsPassNumberAlreadyExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "PassNumber", pass_number) 
         elif InMemoryProcessing is True: IsPassNumberAlreadyExists = pass_number in Old_PassNumbersSet
         
         if pass_number not in Old_PassNumbersSet:
@@ -190,7 +190,7 @@ try:
     TaxesPayerNumbersList = list(TaxesPayerNumbersSet)
     PassNumbersList = list(PassNumbersSet)
 
-    # deleting the initial sets to free the memory
+    # deleting and clearing the initial sets to free the memory
     del Old_PassNumbersSet
     del Old_TaxesPayerNumbersSet
     del TaxesPayerNumbersSet
@@ -205,20 +205,19 @@ try:
         _user = User(FirstName, LastName, TaxesPayerNumber, PassNumber)
     
         Email = FirstName.lower() + "." + LastName.lower() + "@test.com"          
-        IsEmailExists = False                
+        IsEmailExists = False
         
-        while True: 
-            if InMemoryProcessing is False: IsEmailExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "Email", Email)
+        while True:             
+            if InMemoryProcessing is False: IsEmailExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "Email", Email) or (Email in Old_EmailsSet)
             elif InMemoryProcessing is True: IsEmailExists = Email in Old_EmailsSet
             
             if IsEmailExists is False:
                 _user.Email = Email
+                Old_EmailsSet.add(Email)
                 break
             else:
                 Postfix = ''.join(random.sample(Letters, 5)).lower()
-                Email = FirstName.lower() + "." + LastName.lower() + "_" + Postfix.lower() + "@test.com" 
-                
-            
+                Email = FirstName.lower() + "." + LastName.lower() + "_" + Postfix.lower() + "@test.com"
                 
         PhoneNumber = random.randrange(111111111, 999999999)
         _user.PhoneNumber = "'+" + str(PhoneNumber)
