@@ -1,4 +1,4 @@
-﻿from Queries import CreateUsersTable, InsertNewUsers, Check_UsersTableExists, GetSomeValueFromSomeTable_ReturnNumberOfRows, MaintainIndex_DropIdx, MaintainIndex_CreateIdx, MaintainDB_VacuumDB
+﻿from Queries import GetDataForSpecifiedColsAndTable, CreateUsersTable, InsertNewUsers, Check_UsersTableExists, GetSomeValueFromSomeTable_ReturnNumberOfRows, MaintainIndex_DropIdx, MaintainIndex_CreateIdx, MaintainDB_VacuumDB
 import sqlite3
 import csv
 
@@ -12,8 +12,14 @@ def CheckUsersTableAvailability(PathToDBFile):
     Connection.close()
     return IsTableAvailable
 
-def GetAllDataFromSomeTable(PathToDBFile, Query):
-    if Query.strip().lower().startswith("select"):        
+def GetAllDataFromSomeTable(PathToDBFile, ColumnNames, TableName):
+    if TableName.strip().replace(" ", "").startswith('select') == False:        
+        PathToDBFile = str(PathToDBFile)
+        ColumnNames = str(ColumnNames)
+        TableName = str(TableName)
+        
+        Query = GetDataForSpecifiedColsAndTable.replace("@cols", ColumnNames).replace("@tbl", TableName)
+        
         Connection = sqlite3.connect(PathToDBFile)
         Cursor = Connection.cursor()   
     
@@ -23,7 +29,7 @@ def GetAllDataFromSomeTable(PathToDBFile, Query):
         return UsersData
     return []
 
-def GetSomeValueFromSomeTable(PathToDBFile, TableName, ColumnName, Value):
+def IsValueExistsInDB(PathToDBFile, TableName, ColumnName, Value):
     PathToDBFile = str(PathToDBFile)
     TableName = str(TableName)
     ColumnName = str(ColumnName)
@@ -34,10 +40,14 @@ def GetSomeValueFromSomeTable(PathToDBFile, TableName, ColumnName, Value):
     
     Query = GetSomeValueFromSomeTable_ReturnNumberOfRows.replace("@col", ColumnName).replace("@tbl", TableName).replace("@value", Value)
 
-    Result = Cursor.execute(Query).fetchone()[0]
-    
+    Result = Cursor.execute(Query).fetchone()[0]    
     Connection.close()
-    return Result
+    
+    Result = int(Result)
+    
+    if Result > 0:
+        return True    
+    return False
 
 def WriteInfoToFile(Users, PathToCSVFile):    
     with open(PathToCSVFile, mode="a+", encoding="utf-8-sig", newline='') as CsvFile:
