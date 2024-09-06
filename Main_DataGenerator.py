@@ -163,7 +163,7 @@ try:
         InMemoryProcessing = DefaultValue_InMemoryProcessing
         
     LogToConsole("Amount of data to be generated: " + str(Amount))
-    LogToConsole(f"Current operating mode: {'In-Memory' if InMemoryProcessing is True else 'DB'}" + f". Bulk insertion of generated data: {'Activated' if DbBulkInsert is True else 'Deactivated'}")
+    LogToConsole(f"Current operating mode: {'In-Memory' if InMemoryProcessing is True else 'DB'}" + f". Bulk insertion of generated data: {'Activated' if DbBulkInsert is True else 'Deactivated'}" + "\n")
 
     Users = set()
     TaxesPayerNumbersSet = set()
@@ -201,15 +201,15 @@ try:
         if InMemoryProcessing is False: IsPassNumberAlreadyExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "PassNumber", pass_number) 
         elif InMemoryProcessing is True: IsPassNumberAlreadyExists = pass_number in Old_PassNumbersSet
         
-        if pass_number not in Old_PassNumbersSet:
+        if IsPassNumberAlreadyExists is False:
             PassNumbersSet.add(pass_number)
             i = len(PassNumbersSet)
-    LogToConsole("Unique pass numbers were generated")
+    LogToConsole("Unique pass numbers were generated" + "\n")
      
     TaxesPayerNumbersList = list(TaxesPayerNumbersSet)
     PassNumbersList = list(PassNumbersSet)
 
-    # deleting and clearing the initial sets to free the memory
+    # deleting the initial sets to free the memory
     del Old_PassNumbersSet
     del Old_TaxesPayerNumbersSet
     del TaxesPayerNumbersSet
@@ -227,9 +227,8 @@ try:
         IsEmailExists = False
         
         while True:             
-            if InMemoryProcessing is False and DbBulkInsert is True: IsEmailExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "Email", Email) or (Email in Old_EmailsSet)
-            if InMemoryProcessing is False and DbBulkInsert is False: IsEmailExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "Email", Email)
-            elif InMemoryProcessing is True: IsEmailExists = Email in Old_EmailsSet
+            if InMemoryProcessing is True: IsEmailExists = Email in Old_EmailsSet
+            else: IsEmailExists = IsValueExistsInDB(Paths["PathToDB"], "Users", "Email", Email) or (Email in Old_EmailsSet)
             
             if IsEmailExists is False:
                 _user.Email = Email
