@@ -32,9 +32,9 @@ def CalculateExecutionTime(StartTime):
     else:
         ElapsedMilliseconds = "00" + str(int(ExecutionTime.microseconds % 1000))
     
-    ElapsedSeconds = str(ExecutionTime.seconds % 60) if ExecutionTime.seconds % 60 > 9 else str("0") + str(ExecutionTime.seconds % 60)
-    ElapsedMinutes = int((ExecutionTime.seconds / 60) % 60) if (ExecutionTime.seconds / 60) % 60 > 9 else "0" + str(int((ExecutionTime.seconds / 60) % 60))
-    ElapsedHours = int(ExecutionTime.seconds / 60 / 60) if int(ExecutionTime.seconds / 60 / 60) > 9 else "0" + str(int(ExecutionTime.seconds / 60 / 60))
+    ElapsedSeconds = str(ExecutionTime.seconds % 60) if ExecutionTime.seconds % 60 >= 9 else str("0") + str(ExecutionTime.seconds % 60)
+    ElapsedMinutes = str(int((ExecutionTime.seconds / 60) % 60)) if (ExecutionTime.seconds / 60) % 60 >= 9 else "0" + str(int((ExecutionTime.seconds / 60) % 60))
+    ElapsedHours = str(int(ExecutionTime.seconds / 60 / 60)) if int(ExecutionTime.seconds / 60 / 60) >= 9 else "0" + str(int(ExecutionTime.seconds / 60 / 60))
     return f"{ElapsedHours}:{ElapsedMinutes}:{ElapsedSeconds}.{ElapsedMilliseconds}"
 
 
@@ -111,8 +111,8 @@ try:
                 LogToConsole(f"Parameter 'invalid_tax_id_ratio:' having wrong value. Using default value of {DefaultValue_OutputTo} \n")
                 OutputTo = DefaultValue_OutputTo
                 
-        # 0 - Checking for uniqueness of values (Email, TaxId and PassNumber) in DB. Good for small amounts of data (lower than 1000)
-        # 1 - Checking for uniqueness of values (Email, TaxId and PassNumber) in RAM. Faster than DB checking, good for huge amounts of data (more than 1000)
+        # 0 - Checking for uniqueness of values (Email, TaxId and PassNumber) in DB. Good for small amounts of data (lower than 50000)
+        # 1 - Checking for uniqueness of values (Email, TaxId and PassNumber) in RAM. Faster than DB checking, good for huge amounts of data (more than 50000)
         elif item.startswith("in_memory_processing"):
             value = item.split(":")[1]
             if value.strip().isdigit():
@@ -243,10 +243,10 @@ try:
                 
         PhoneNumber = random.randrange(111111111, 999999999)
         _user.PhoneNumber = "'+" + str(PhoneNumber)
-
         _user.Comment = "O kurwa! Popierdolony numer podatnika" if TaxesPayerNumber < ValidTaxesPayerNumber_LowerValue else "" 
 
         Users.add(_user)
+        
         if not DbBulkInsert:
            if OutputTo == 0: WriteInfoToFile(Users, Paths["PathToCSV"])
            elif OutputTo == 1: WriteInfoToDB(Users, Paths["PathToDB"])
