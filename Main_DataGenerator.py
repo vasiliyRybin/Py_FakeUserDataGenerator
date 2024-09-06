@@ -91,6 +91,7 @@ try:
                 LogToConsole(f"Parameter 'amount:' having wrong value. Using default value of {DefaultValue_Amount} \n")
                 Amount = DefaultValue_Amount
         
+        #Parameter, responsible for amount of generated (in percents) invalid TaxID. When invalid tax ID was generated, we creating comment, telling that we having wrong TaxID
         elif item.startswith("invalid_tax_id_ratio"):
             value = item.split(":")[1]
             if value.isdigit():
