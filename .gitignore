@@ -366,3 +366,4 @@ FodyWeavers.xsd
 *.csv 
 Log.txt
 /TestUserData.db
+*.db-journal
