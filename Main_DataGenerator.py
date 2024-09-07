@@ -20,8 +20,9 @@ def LogToConsole(Message):
 
 def CalculateExecutionTime(StartTime):
     #"2024-08-28 15:43:00"
-    #StartTime = datetime(year= 2024, month= 8, day= 28, hour= 15, minute= 43, second=0)
-    EndTime = datetime.now()
+    #StartTime = datetime(year= 2024, month= 9, day= 7, hour= 15, minute= 15, second=59)
+    #EndTime = datetime(year= 2024, month= 9, day= 7, hour= 16, minute= 25, second=51)
+    #EndTime = datetime.now()
     ExecutionTime = EndTime - StartTime
     ElapsedMilliseconds = "000"
     
@@ -32,9 +33,9 @@ def CalculateExecutionTime(StartTime):
     else:
         ElapsedMilliseconds = "00" + str(int(ExecutionTime.microseconds % 1000))
     
-    ElapsedSeconds = str(ExecutionTime.seconds % 60) if ExecutionTime.seconds % 60 >= 9 else str("0") + str(ExecutionTime.seconds % 60)
-    ElapsedMinutes = str(int((ExecutionTime.seconds / 60) % 60)) if (ExecutionTime.seconds / 60) % 60 >= 9 else "0" + str(int((ExecutionTime.seconds / 60) % 60))
-    ElapsedHours = str(int(ExecutionTime.seconds / 60 / 60)) if int(ExecutionTime.seconds / 60 / 60) >= 9 else "0" + str(int(ExecutionTime.seconds / 60 / 60))
+    ElapsedSeconds = str(ExecutionTime.seconds % 60) if ExecutionTime.seconds % 60 > 9 else str("0") + str(ExecutionTime.seconds % 60)
+    ElapsedMinutes = str(int((ExecutionTime.seconds / 60) % 60)) if int((ExecutionTime.seconds / 60) % 60) > 9 else str("0") + str(int((ExecutionTime.seconds / 60) % 60))
+    ElapsedHours = str(int(ExecutionTime.seconds / 60 / 60)) if int(ExecutionTime.seconds / 60 / 60) > 9 else str("0") + str(int(ExecutionTime.seconds / 60 / 60))
     return f"{ElapsedHours}:{ElapsedMinutes}:{ElapsedSeconds}.{ElapsedMilliseconds}"
 
 
