@@ -22,7 +22,7 @@ def CalculateExecutionTime(StartTime):
     #"2024-08-28 15:43:00"
     #StartTime = datetime(year= 2024, month= 9, day= 7, hour= 15, minute= 15, second=59)
     #EndTime = datetime(year= 2024, month= 9, day= 7, hour= 16, minute= 25, second=51)
-    #EndTime = datetime.now()
+    EndTime = datetime.now()
     ExecutionTime = EndTime - StartTime
     ElapsedMilliseconds = "000"
     
