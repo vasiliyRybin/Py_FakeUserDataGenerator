@@ -2,9 +2,9 @@
 
 GetSomeValueFromSomeTable_ReturnNumberOfRows = "SELECT COUNT(@col) AS Cnt FROM @tbl WHERE @col = '@value'"
 
-CreateUsersTable = "CREATE TABLE Users(FirstName TEXT, LastName TEXT, PhoneNumber TEXT, Email TEXT, TaxID INTEGER, PassNumber TEXT, Comment TEXT)"
+CreateUsersTable = "CREATE TABLE Users(TaxID INTEGER PRIMARY KEY, Comment TEXT, Email TEXT, FirstName TEXT, LastName TEXT, PassNumber TEXT, PhoneNumber TEXT)"
 
-InsertNewUsers = "INSERT INTO Users VALUES(:FirstName, :LastName, :PhoneNumber, :Email, :TaxID, :PassNumber, :Comment)"
+InsertNewUsers = "INSERT INTO Users(TaxID, Comment, Email, FirstName, LastName, PassNumber, PhoneNumber) VALUES(:TaxID, :Comment, :Email, :FirstName, :LastName, :PassNumber, :PhoneNumber)"
 
 GetAllUsers = "SELECT * FROM Users"
 
